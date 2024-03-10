@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IP Address Estimator</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        body {
+            background-color: #f2f2f2;
+            font-family: monospace;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #map {
+            height: 400px;
+            width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <h1>IP Address Estimator</h1>
+    <div>
+        <input type="text" id="ipInput" placeholder="Enter IP address" />
+        <button onclick="locateIP()">Locate</button>
+    </div>
+    <div id="map"></div>
+
+    <script>
+        var map = L.map('map').setView([51.505, -0.09], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19,
+        }).addTo(map);
+
+        async function locateIP() {
+            var ip = document.getElementById('ipInput').value;
+            var apiURL = `https://api.ipgeolocation.io/ipgeo?apiKey=fe1c8e8ac52548dda2e9c112c6cbdc24&ip=${ip}`;
+
+            try {
+                const response = await fetch(apiURL);
+                const data = await response.json();
+                const location = { lat: data.latitude, lng: data.longitude };
+
+                map.setView(location, 13);
+                L.marker(location).addTo(map)
+                    .bindPopup(`Location for IP: ${ip}`)
+                    .openPopup();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    </script>
+    
+    <h3>*Note: This is only an estimate, and is usually not exactly accurate.*</h3>
+</body>
+</html>
